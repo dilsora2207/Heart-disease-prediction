@@ -1,6 +1,7 @@
 import pickle
 import numpy as np
 import pandas as pd
+from pathlib import Path
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -19,9 +20,11 @@ templates = Jinja2Templates(directory="templates")
 #  Load Model, Scaler, Column Order
 # =====================================================
 
-MODEL_PATH   = r"C:\Users\ofniz\Desktop\Heart Disease Prediction\Models\Gradient Boosting(optimization)\model.pkl"
-SCALER_PATH  = r"C:\Users\ofniz\Desktop\Heart Disease Prediction\Data\processed\scaler.pkl"
-COLUMNS_PATH = r"C:\Users\ofniz\Desktop\Heart Disease Prediction\Data\processed\columns.pkl"
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+MODEL_PATH = BASE_DIR / "Models" / "Gradient Boosting(optimization)" / "model.pkl"
+SCALER_PATH = BASE_DIR / "Data" / "processed" / "scaler.pkl"
+COLUMNS_PATH = BASE_DIR / "Data" / "processed" / "columns.pkl"
 
 with open(MODEL_PATH, "rb") as f:
     model = pickle.load(f)

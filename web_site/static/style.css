@@ -1,0 +1,486 @@
+/* =====================================================
+   CardioPredict — Heart Disease Prediction UI
+   ===================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg:          #f7f4f0;
+  --surface:     #ffffff;
+  --border:      #e5e0d8;
+  --text:        #1a1614;
+  --text-muted:  #7a6f66;
+  --accent:      #c0392b;
+  --accent-soft: #fdf0ef;
+  --accent-mid:  #e8b4b0;
+  --green:       #22c55e;
+  --amber:       #f59e0b;
+  --red:         #ef4444;
+  --radius:      12px;
+  --shadow:      0 2px 16px rgba(26,22,20,0.08);
+  --shadow-lg:   0 8px 40px rgba(26,22,20,0.13);
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ----- Header ----- */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo { display: flex; align-items: center; gap: 10px; }
+
+.logo-icon {
+  font-size: 22px;
+  color: var(--accent);
+  animation: heartbeat 2s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14%       { transform: scale(1.2); }
+  28%       { transform: scale(1); }
+  42%       { transform: scale(1.1); }
+  56%       { transform: scale(1); }
+}
+
+.logo-text {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--text);
+}
+
+.header-right { display: flex; align-items: center; gap: 12px; }
+
+.patient-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-mid);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+.header-badge {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+/* ----- Main ----- */
+main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+}
+
+/* ----- Hero ----- */
+.hero { text-align: center; margin-bottom: 48px; }
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 6vw, 56px);
+  line-height: 1.15;
+  color: var(--text);
+  letter-spacing: -1px;
+  margin-bottom: 16px;
+}
+
+.hero h1 em { font-style: italic; color: var(--accent); }
+
+.hero-sub {
+  color: var(--text-muted);
+  max-width: 520px;
+  margin: 0 auto;
+  font-size: 15px;
+  font-weight: 300;
+}
+
+/* ----- Result Card ----- */
+.result-section {
+  margin-bottom: 48px;
+  animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.result-card {
+  background: var(--surface);
+  border: 2px solid var(--risk-color, var(--border));
+  border-radius: 20px;
+  padding: 40px 32px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.result-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--risk-color, #ccc) 8%, transparent), transparent 60%);
+  pointer-events: none;
+}
+
+.result-patient-id {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.result-icon { font-size: 48px; margin-bottom: 12px; display: block; }
+
+.result-label {
+  font-family: var(--font-display);
+  font-size: 32px;
+  margin-bottom: 20px;
+  letter-spacing: -0.5px;
+}
+
+.result-prob {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.prob-value {
+  font-size: 56px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -2px;
+  color: var(--text);
+}
+
+.prob-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.prob-bar-wrap {
+  background: var(--border);
+  border-radius: 999px;
+  height: 8px;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 20px;
+  overflow: hidden;
+}
+
+.prob-bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.result-disclaimer {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 10px 16px;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+/* ----- Form Section ----- */
+.form-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px 36px;
+  box-shadow: var(--shadow);
+}
+
+/* ----- Patient ID Row ----- */
+.patient-id-row {
+  margin-bottom: 28px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.patient-id-row .field input {
+  max-width: 360px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* ----- Form Grid ----- */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 28px;
+  margin-bottom: 36px;
+}
+
+.field-group { display: flex; flex-direction: column; gap: 16px; }
+
+.group-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--accent);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--accent-mid);
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+
+.field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.unit {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
+  background: var(--bg);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-muted);
+  font-size: 10px;
+  cursor: help;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.field input,
+.field select {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+}
+
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a6f66' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.field input::placeholder { color: var(--text-muted); font-weight: 300; }
+
+/* ----- Submit Row ----- */
+.submit-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-predict {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 999px;
+  padding: 16px 48px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.btn-predict:hover {
+  background: #a93226;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.btn-predict:active { transform: translateY(0); }
+
+.btn-icon { font-size: 18px; animation: heartbeat 2s ease-in-out infinite; }
+
+.btn-clear-form {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  padding: 14px 28px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-clear-form:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ----- History Section ----- */
+.history-section {
+  margin-top: 40px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 36px;
+  box-shadow: var(--shadow);
+  animation: slideUp 0.4s ease;
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.history-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--text);
+  font-weight: 400;
+}
+
+.btn-clear-history {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 16px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-clear-history:hover { border-color: var(--red); color: var(--red); }
+
+.history-table-wrap { overflow-x: auto; }
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.history-table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-bottom: 1.5px solid var(--border);
+}
+
+.history-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.history-table tr:last-child td { border-bottom: none; }
+
+.history-table tr:hover td { background: var(--bg); }
+
+.risk-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.risk-low      { background: #dcfce7; color: #15803d; }
+.risk-moderate { background: #fef9c3; color: #a16207; }
+.risk-high     { background: #fee2e2; color: #b91c1c; }
+
+/* ----- Footer ----- */
+footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-muted);
+  font-size: 12px;
+  border-top: 1px solid var(--border);
+  margin-top: 32px;
+}
+
+/* ----- Responsive ----- */
+@media (max-width: 600px) {
+  main { padding: 32px 16px 48px; }
+  .form-section, .history-section { padding: 24px 20px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .result-card { padding: 28px 20px; }
+  .prob-value { font-size: 44px; }
+  .header-badge { display: none; }
+  .submit-row { flex-direction: column; }
+}

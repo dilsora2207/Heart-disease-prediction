@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Heart Disease Prediction</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">♥</span>
+        <span class="logo-text">CardioPredict</span>
+      </div>
+      <div class="header-right">
+        <span class="patient-count" id="patient-count">0 patients</span>
+
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <section class="hero">
+      <h1>Heart Disease<br><em>Risk Assessment</em></h1>
+      <p class="hero-sub">Enter 12 clinical features below. The model will predict your probability of heart disease and classify your risk level.</p>
+    </section>
+
+    <!-- RESULT CARD -->
+    {% if result %}
+    <section class="result-section" id="result">
+      <div class="result-card" style="--risk-color: {{ risk_color }}">
+        <div class="result-patient-id">{{ patient_id }}</div>
+        <div class="result-icon">{{ risk_icon }}</div>
+        <div class="result-label" style="color: {{ risk_color }}">{{ risk_label }}</div>
+        <div class="result-prob">
+          <span class="prob-value">{{ probability }}%</span>
+          <span class="prob-label">Probability of Heart Disease</span>
+        </div>
+        <div class="prob-bar-wrap">
+          <div class="prob-bar" style="width: {{ probability }}%; background: {{ risk_color }}"></div>
+        </div>
+        <p class="result-disclaimer">
+          ⚕️ This is a machine learning prediction, not medical advice. Always consult a qualified physician.
+        </p>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- FORM -->
+    <section class="form-section">
+      <form method="POST" action="/predict" id="predict-form">
+
+        <!-- PATIENT ID -->
+        <div class="patient-id-row">
+          <div class="field">
+            <label for="patient_id">Patient Name / ID</label>
+            <input type="text" id="patient_id" name="patient_id"
+                   value="{{ patient_id if patient_id is defined else '' }}"
+                   placeholder="e.g. John Doe or P-001" required />
+          </div>
+        </div>
+
+        <div class="form-grid">
+
+          <div class="field-group">
+            <h3 class="group-title">Patient Demographics</h3>
+            <div class="field">
+              <label for="age">Age <span class="unit">years</span></label>
+              <input type="number" id="age" name="age" min="1" max="120" step="1"
+                     value="{{ age if age is defined else '' }}" placeholder="e.g. 54" required />
+            </div>
+            <div class="field">
+              <label for="sex">Sex</label>
+              <select id="sex" name="sex" required>
+                <option value="" disabled {% if sex is not defined %}selected{% endif %}>Select…</option>
+                <option value="1" {% if sex is defined and sex == 1.0 %}selected{% endif %}>Male</option>
+                <option value="0" {% if sex is defined and sex == 0.0 %}selected{% endif %}>Female</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <h3 class="group-title">Chest Pain & Blood Pressure</h3>
+            <div class="field">
+              <label for="cp">Chest Pain Type <span class="hint" title="0=Typical Angina, 1=Atypical Angina, 2=Non-anginal Pain, 3=Asymptomatic">?</span></label>
+              <select id="cp" name="cp" required>
+                <option value="" disabled {% if cp is not defined %}selected{% endif %}>Select…</option>
+                <option value="0" {% if cp is defined and cp == 0.0 %}selected{% endif %}>0 – Typical Angina</option>
+                <option value="1" {% if cp is defined and cp == 1.0 %}selected{% endif %}>1 – Atypical Angina</option>
+                <option value="2" {% if cp is defined and cp == 2.0 %}selected{% endif %}>2 – Non-anginal Pain</option>
+                <option value="3" {% if cp is defined and cp == 3.0 %}selected{% endif %}>3 – Asymptomatic</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="trestbps">Resting Blood Pressure <span class="unit">mm Hg</span></label>
+              <input type="number" id="trestbps" name="trestbps" min="50" max="250" step="1"
+                     value="{{ trestbps if trestbps is defined else '' }}" placeholder="e.g. 130" required />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <h3 class="group-title">Cholesterol & Blood Sugar</h3>
+            <div class="field">
+              <label for="chol">Serum Cholesterol <span class="unit">mg/dl</span></label>
+              <input type="number" id="chol" name="chol" min="100" max="600" step="1"
+                     value="{{ chol if chol is defined else '' }}" placeholder="e.g. 246" required />
+            </div>
+            <div class="field">
+              <label for="fbs">Fasting Blood Sugar > 120 mg/dl</label>
+              <select id="fbs" name="fbs" required>
+                <option value="" disabled {% if fbs is not defined %}selected{% endif %}>Select…</option>
+                <option value="1" {% if fbs is defined and fbs == 1.0 %}selected{% endif %}>Yes (> 120 mg/dl)</option>
+                <option value="0" {% if fbs is defined and fbs == 0.0 %}selected{% endif %}>No (≤ 120 mg/dl)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <h3 class="group-title">ECG & Heart Rate</h3>
+            <div class="field">
+              <label for="restecg">Resting ECG <span class="hint" title="0=Normal, 1=ST-T wave abnormality, 2=Left ventricular hypertrophy">?</span></label>
+              <select id="restecg" name="restecg" required>
+                <option value="" disabled {% if restecg is not defined %}selected{% endif %}>Select…</option>
+                <option value="0" {% if restecg is defined and restecg == 0.0 %}selected{% endif %}>0 – Normal</option>
+                <option value="1" {% if restecg is defined and restecg == 1.0 %}selected{% endif %}>1 – ST-T Abnormality</option>
+                <option value="2" {% if restecg is defined and restecg == 2.0 %}selected{% endif %}>2 – LV Hypertrophy</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="thalach">Max Heart Rate Achieved <span class="unit">bpm</span></label>
+              <input type="number" id="thalach" name="thalach" min="60" max="250" step="1"
+                     value="{{ thalach if thalach is defined else '' }}" placeholder="e.g. 150" required />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <h3 class="group-title">Exercise Test</h3>
+            <div class="field">
+              <label for="exang">Exercise-Induced Angina</label>
+              <select id="exang" name="exang" required>
+                <option value="" disabled {% if exang is not defined %}selected{% endif %}>Select…</option>
+                <option value="1" {% if exang is defined and exang == 1.0 %}selected{% endif %}>Yes</option>
+                <option value="0" {% if exang is defined and exang == 0.0 %}selected{% endif %}>No</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="oldpeak">ST Depression (Oldpeak) <span class="unit">mm</span></label>
+              <input type="number" id="oldpeak" name="oldpeak" min="0" max="10" step="0.1"
+                     value="{{ oldpeak if oldpeak is defined else '' }}" placeholder="e.g. 1.5" required />
+            </div>
+            <div class="field">
+              <label for="slope">ST Slope <span class="hint" title="0=Upsloping, 1=Flat, 2=Downsloping">?</span></label>
+              <select id="slope" name="slope" required>
+                <option value="" disabled {% if slope is not defined %}selected{% endif %}>Select…</option>
+                <option value="0" {% if slope is defined and slope == 0.0 %}selected{% endif %}>0 – Upsloping</option>
+                <option value="1" {% if slope is defined and slope == 1.0 %}selected{% endif %}>1 – Flat</option>
+                <option value="2" {% if slope is defined and slope == 2.0 %}selected{% endif %}>2 – Downsloping</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <h3 class="group-title">Fluoroscopy</h3>
+            <div class="field">
+              <label for="ca">Major Vessels Colored <span class="hint" title="Number of major vessels colored by fluoroscopy (0–3)">?</span></label>
+              <select id="ca" name="ca" required>
+                <option value="" disabled {% if ca is not defined %}selected{% endif %}>Select…</option>
+                <option value="0" {% if ca is defined and ca == 0.0 %}selected{% endif %}>0</option>
+                <option value="1" {% if ca is defined and ca == 1.0 %}selected{% endif %}>1</option>
+                <option value="2" {% if ca is defined and ca == 2.0 %}selected{% endif %}>2</option>
+                <option value="3" {% if ca is defined and ca == 3.0 %}selected{% endif %}>3</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="submit-row">
+          <button type="button" class="btn-clear-form" onclick="clearForm()">✕ Clear Form</button>
+          <button type="submit" class="btn-predict">
+            <span class="btn-icon">♥</span> Predict Risk
+          </button>
+        </div>
+
+      </form>
+    </section>
+
+    <!-- PATIENT HISTORY -->
+    <section class="history-section" id="history-section" style="display:none;">
+      <div class="history-header">
+        <h2 class="history-title">Patient History</h2>
+        <button class="btn-clear-history" onclick="clearHistory()">✕ Clear All</button>
+      </div>
+      <div class="history-table-wrap">
+        <table class="history-table" id="history-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Patient</th>
+              <th>Age</th>
+              <th>Sex</th>
+              <th>Probability</th>
+              <th>Risk Level</th>
+            </tr>
+          </thead>
+          <tbody id="history-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Heart Disease Prediction · Gradient Boosting · End-to-End ML Project</p>
+  </footer>
+
+  <script>
+    // ── Patient history stored in sessionStorage (clears when tab closes) ──
+
+    const STORAGE_KEY = 'cardiopredict_history';
+
+    function getHistory() {
+      try { return JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '[]'); }
+      catch { return []; }
+    }
+
+    function saveHistory(history) {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    }
+
+    function renderHistory() {
+      const history = getHistory();
+      const section = document.getElementById('history-section');
+      const tbody   = document.getElementById('history-body');
+      const counter = document.getElementById('patient-count');
+
+      counter.textContent = history.length + (history.length === 1 ? ' patient' : ' patients');
+
+      if (history.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+
+      section.style.display = 'block';
+      tbody.innerHTML = '';
+
+      history.forEach((p, i) => {
+        const tr = document.createElement('tr');
+        const riskClass = p.risk === 'Low Risk' ? 'risk-low' : p.risk === 'Moderate Risk' ? 'risk-moderate' : 'risk-high';
+        tr.innerHTML = `
+          <td>${i + 1}</td>
+          <td><strong>${p.name}</strong></td>
+          <td>${p.age}</td>
+          <td>${p.sex === '1' || p.sex === 1 ? 'Male' : 'Female'}</td>
+          <td><strong>${p.probability}%</strong></td>
+          <td><span class="risk-badge ${riskClass}">${p.risk}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function clearHistory() {
+      sessionStorage.removeItem(STORAGE_KEY);
+      renderHistory();
+    }
+
+    function clearForm() {
+      document.getElementById('patient_id').value = '';
+      document.getElementById('age').value = '';
+      document.getElementById('sex').value = '';
+      document.getElementById('cp').value = '';
+      document.getElementById('trestbps').value = '';
+      document.getElementById('chol').value = '';
+      document.getElementById('fbs').value = '';
+      document.getElementById('restecg').value = '';
+      document.getElementById('thalach').value = '';
+      document.getElementById('exang').value = '';
+      document.getElementById('oldpeak').value = '';
+      document.getElementById('slope').value = '';
+      document.getElementById('ca').value = '';
+    }
+
+    // ── On page load: render existing history ──
+    window.addEventListener('DOMContentLoaded', () => {
+      renderHistory();
+
+      // If there's a result on this page load, save it to history
+      {% if result %}
+      const history = getHistory();
+      // Avoid duplicate entries for same patient
+      const exists = history.some(p => p.name === "{{ patient_id }}" && p.probability === {{ probability }});
+      if (!exists) {
+        history.push({
+          name:        "{{ patient_id }}",
+          age:         {{ age }},
+          sex:         "{{ sex }}",
+          probability: {{ probability }},
+          risk:        "{{ risk_label }}",
+        });
+        saveHistory(history);
+      }
+      renderHistory();
+
+      // Scroll to result
+      const result = document.getElementById('result');
+      if (result) setTimeout(() => result.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+      {% endif %}
+    });
+  </script>
+
+</body>
+</html>

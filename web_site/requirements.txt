@@ -2,6 +2,6 @@ fastapi
 uvicorn[standard]
 jinja2
 python-multipart
-scikit-learn
+scikit-learn = 1.8.0
 numpy
 pandas

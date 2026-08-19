@@ -1,0 +1,2 @@
+Model,Accuracy,Precision,Recall,F1-score,ROC-AUC
+logistic_regression,0.7604,0.7366,0.6439,0.6871,0.8205

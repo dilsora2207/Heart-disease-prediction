@@ -1,0 +1,2 @@
+solver,penalty,max_iter,l1_ratio,class_weight,C
+saga,elasticnet,1000,0.5,balanced,1

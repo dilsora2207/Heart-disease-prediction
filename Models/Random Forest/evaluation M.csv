@@ -1,0 +1,2 @@
+Model,Accuracy,Precision,Recall,F1-score,ROC-AUC
+random_forest,0.7514,0.7027,0.6789,0.6906,0.8043
